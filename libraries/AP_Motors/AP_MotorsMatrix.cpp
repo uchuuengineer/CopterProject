@@ -106,7 +106,24 @@ void AP_MotorsMatrix::output_to_motors()
     // convert output to PWM and send to each motor
     for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
         if (motor_enabled[i]) {
-            rc_write(i, output_to_pwm(_actuator[i]));
+            rc_write(i, output_to_pwm(_actuator[i]));  // EDIT HERE, FLIGHT CONTROL
+
+float actuator_av= 0.0f;
+//perc_piezo=perc_piezo();
+float perc_piezo=0.0f;
+    // convert output to PWM and send to each motor
+    for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
+        if (motor_enabled[i]) {
+            actuator_av=actuator_av+_actuator[i];
+        }
+    }
+    actuator_av=actuator_av/4;
+    for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
+        if (motor_enabled[i]) {
+            _actuator[i]=(1-perc_piezo)*(_actuator[i]) + perc_piezo*actuator_av;
+                 // _actuator[i]=actuator_av;
+           rc_write(i, output_to_pwm(_actuator[i]));  // EDIT HERE, FLIGHT CONTROL
+           rc_write(i+4, output_to_pwm((_actuator[i])*.3));
         }
     }
 }

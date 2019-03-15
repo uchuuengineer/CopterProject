@@ -702,6 +702,10 @@ void RC_Channel::init_aux()
     init_aux_function((aux_func_t)option.get(), position);
 }
 
+int perc_piezo;
+
+int function(); 
+
 // read_3pos_switch
 bool RC_Channel::read_3pos_switch(RC_Channel::aux_switch_pos_t &ret) const
 {
@@ -710,7 +714,13 @@ bool RC_Channel::read_3pos_switch(RC_Channel::aux_switch_pos_t &ret) const
         return false;
     }
     if (in < AUX_PWM_TRIGGER_LOW) {
-        ret = LOW;
+        int main()
+{
+    perc_piezo=0;
+    function();
+    return 0;
+}
+ret =perc_piezo;
     } else if (in > AUX_PWM_TRIGGER_HIGH) {
         ret = HIGH;
     } else {
