@@ -20,6 +20,7 @@
  */
 #include <AP_HAL/AP_HAL.h>
 #include "AP_MotorsMatrix.h"
+#include <RC_Channel/RC_Channel.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -103,14 +104,31 @@ void AP_MotorsMatrix::output_to_motors()
             break;
     }
 
-    // convert output to PWM and send to each motor
-    for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
-        if (motor_enabled[i]) {
-            rc_write(i, output_to_pwm(_actuator[i]));  // EDIT HERE, FLIGHT CONTROL
-
 float actuator_av= 0.0f;
-//perc_piezo=perc_piezo();
-float perc_piezo=0.0f;
+int16_t RC_Channel::output_piezo(){
+int16_t piezo=RC_Channel::output_piezo(0);
+}
+/*
+uint16_t AP_MotorsMatrix::get_motor_mask()
+{
+    uint16_t motor_mask = 0;
+    for (uint8_t i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
+        if (motor_enabled[i]) {
+            motor_mask |= 1U << i;
+        }
+    }
+    uint16_t mask = rc_map_mask(motor_mask);
+
+    // add parent's mask
+    mask |= AP_MotorsMulticopter::get_motor_mask();
+
+    return mask;
+}
+
+*/
+
+
+
     // convert output to PWM and send to each motor
     for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
         if (motor_enabled[i]) {

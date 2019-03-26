@@ -220,6 +220,7 @@ private:
 
     AP_Int8     reversed;
     AP_Int16    dead_zone;
+    AP_Int32    perc_piezo2;
 
     ChannelType type_in;
     int16_t     high_in;
@@ -239,6 +240,7 @@ private:
     // pwm value below which the option will be disabled:
     static const uint16_t AUX_PWM_TRIGGER_LOW = 1200;
     bool read_3pos_switch(aux_switch_pos_t &ret) const WARN_IF_UNUSED;
+    int16_t output_piezo(aux_switch_pos_t) const;
 
     //Documentation of Aux Switch Flags:
     // 0 is low or false, 1 is center or true, 2 is high

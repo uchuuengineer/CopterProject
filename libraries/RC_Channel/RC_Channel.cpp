@@ -34,6 +34,8 @@ extern const AP_HAL::HAL& hal;
 #include <AP_Gripper/AP_Gripper.h>
 #include <AP_LandingGear/AP_LandingGear.h>
 
+#define PERC_PIEZO2_DEFAULT 0
+
 const AP_Param::GroupInfo RC_Channel::var_info[] = {
     // @Param: MIN
     // @DisplayName: RC min PWM
@@ -86,6 +88,13 @@ const AP_Param::GroupInfo RC_Channel::var_info[] = {
     // @User: Standard
     AP_GROUPINFO_FRAME("OPTION",  6, RC_Channel, option, 0, AP_PARAM_FRAME_COPTER|AP_PARAM_FRAME_ROVER|AP_PARAM_FRAME_PLANE),
 
+    // @Param: PERC_PIEZO2
+    // @DisplayName: Percent Piezo2
+    // @Description: The new library parameter description goes here
+    // @Range: 0 1
+    // @User: Advanced
+    AP_GROUPINFO("PERC", 7, RC_Channel, perc_piezo2, PERC_PIEZO2_DEFAULT),
+    
     AP_GROUPEND
 };
 
@@ -360,7 +369,7 @@ bool RC_Channel::has_override() const
 //
 // support for auxillary switches:
 //
-#define MODE_SWITCH_DEBOUNCE_TIME_MS  200
+#define MODE_SWITCH_DEBOUNCE_TIME_MS  200 
 
 uint32_t RC_Channel::old_switch_positions;
 RC_Channel::modeswitch_state_t RC_Channel::mode_switch_state;
@@ -692,7 +701,6 @@ void RC_Channel::do_aux_function(const aux_func_t ch_option, const aux_switch_po
         break;
     }
 }
-
 void RC_Channel::init_aux()
 {
     aux_switch_pos_t position;
@@ -702,7 +710,6 @@ void RC_Channel::init_aux()
     init_aux_function((aux_func_t)option.get(), position);
 }
 
-int perc_piezo;
 
 int function(); 
 
@@ -714,19 +721,28 @@ bool RC_Channel::read_3pos_switch(RC_Channel::aux_switch_pos_t &ret) const
         return false;
     }
     if (in < AUX_PWM_TRIGGER_LOW) {
-        int main()
-{
-    perc_piezo=0;
-    function();
-    return 0;
-}
-ret =perc_piezo;
+        ret = LOW;  
     } else if (in > AUX_PWM_TRIGGER_HIGH) {
         ret = HIGH;
     } else {
         ret = MIDDLE;
     }
     return true;
+}
+
+int16_t RC_Channel::output_piezo(RC_Channel::aux_switch_pos_t) const
+{
+    const uint16_t in = get_radio_in();
+    //if (in <= 900 or in >= 2200) {
+     //   return false;
+    //}
+    if (in < AUX_PWM_TRIGGER_LOW) {
+        return 0;  
+    } else if (in > AUX_PWM_TRIGGER_HIGH) {
+        return 1;
+    } else {
+        return 0.5;
+    }
 }
 
 RC_Channel *RC_Channels::find_channel_for_option(const RC_Channel::aux_func_t option)
