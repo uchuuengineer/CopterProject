@@ -53,6 +53,7 @@ void AP_MotorsMatrix::set_update_rate( uint16_t speed_hz )
     rc_set_freq(mask, _speed_hz );
 }
 
+
 // set frame class (i.e. quad, hexa, heli) and type (i.e. x, plus)
 void AP_MotorsMatrix::set_frame_class_and_type(motor_frame_class frame_class, motor_frame_type frame_type)
 {
@@ -69,6 +70,40 @@ void AP_MotorsMatrix::set_frame_class_and_type(motor_frame_class frame_class, mo
     // enable fast channels or instant pwm
     set_update_rate(_speed_hz);
 }
+
+float actuator_av= 0.0f;
+
+void RC_Channel::read_mode_switch()
+{
+    // calculate position of flight mode switch
+    const uint16_t pulsewidth = get_radio_in();
+    if (pulsewidth <= 900 || pulsewidth >= 2200) {
+        return;  // This is an error condition
+    }
+/*int16_t RC_Channel::output_piezo(){
+int16_t piezo=RC_Channel::output_piezo(0);
+}
+*/
+//       uint16_t in = RC_Channel::get_radio_in();
+/*
+uint16_t AP_MotorsMatrix::get_motor_mask()
+{
+    uint16_t motor_mask = 0;
+    for (uint8_t i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
+        if (motor_enabled[i]) {
+            motor_mask |= 1U << i;
+        }
+    }
+    uint16_t mask = rc_map_mask(motor_mask);
+
+    // add parent's mask
+    mask |= AP_MotorsMulticopter::get_motor_mask();
+
+    return mask;
+}
+
+*/
+float perc_piezo=0.0f;
 
 void AP_MotorsMatrix::output_to_motors()
 {
@@ -104,28 +139,7 @@ void AP_MotorsMatrix::output_to_motors()
             break;
     }
 
-float actuator_av= 0.0f;
-int16_t RC_Channel::output_piezo(){
-int16_t piezo=RC_Channel::output_piezo(0);
-}
-/*
-uint16_t AP_MotorsMatrix::get_motor_mask()
-{
-    uint16_t motor_mask = 0;
-    for (uint8_t i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
-        if (motor_enabled[i]) {
-            motor_mask |= 1U << i;
-        }
-    }
-    uint16_t mask = rc_map_mask(motor_mask);
 
-    // add parent's mask
-    mask |= AP_MotorsMulticopter::get_motor_mask();
-
-    return mask;
-}
-
-*/
 
 
 

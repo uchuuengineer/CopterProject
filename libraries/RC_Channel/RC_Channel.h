@@ -79,6 +79,8 @@ public:
     int16_t    get_control_in() const { return control_in;}
     void       set_control_in(int16_t val) { control_in = val;}
 
+    void read_mode_switch();
+
     void       clear_override();
     void       set_override(const uint16_t v, const uint32_t timestamp_us);
     bool       has_override() const;
@@ -272,7 +274,7 @@ private:
     debounce_state_t debounce;
 
     void reset_mode_switch();
-    void read_mode_switch();
+    //void read_mode_switch();
 };
 
 
