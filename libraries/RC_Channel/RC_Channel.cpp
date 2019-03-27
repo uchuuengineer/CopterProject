@@ -729,7 +729,7 @@ bool RC_Channel::read_3pos_switch(RC_Channel::aux_switch_pos_t &ret) const
     }
     return true;
 }
-
+/*
 int16_t RC_Channel::output_piezo(RC_Channel::aux_switch_pos_t) const
 {
     const uint16_t in = get_radio_in();
@@ -744,7 +744,7 @@ int16_t RC_Channel::output_piezo(RC_Channel::aux_switch_pos_t) const
         return 0.5;
     }
 }
-
+*/
 RC_Channel *RC_Channels::find_channel_for_option(const RC_Channel::aux_func_t option)
 {
     for (uint8_t i=0; i<NUM_RC_CHANNELS; i++) {

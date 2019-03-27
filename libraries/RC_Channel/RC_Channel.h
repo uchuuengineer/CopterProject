@@ -182,7 +182,7 @@ public:
     };
     typedef enum aux_func aux_func_t;
 
-protected:
+// protected:
 
     // auxillary switch handling (n.b.: we store this as 2-bits!):
     enum aux_switch_pos_t : uint8_t {
@@ -208,7 +208,7 @@ protected:
         // no action by default (e.g. Tracker, Sub, who do their own thing)
     };
 
-private:
+// private:
 
     // pwm is stored here
     int16_t     radio_in;
@@ -242,11 +242,10 @@ private:
     // pwm value below which the option will be disabled:
     static const uint16_t AUX_PWM_TRIGGER_LOW = 1200;
     bool read_3pos_switch(aux_switch_pos_t &ret) const WARN_IF_UNUSED;
-    int16_t output_piezo(aux_switch_pos_t) const;
-
     //Documentation of Aux Switch Flags:
     // 0 is low or false, 1 is center or true, 2 is high
     // pairs of bits in old_switch_positions give the old switch position for an RC input.
+    float output_piezo(aux_switch_pos_t) const;   //////////////////////////////
     static uint32_t old_switch_positions;
 
     aux_switch_pos_t old_switch_position() const {

@@ -72,14 +72,24 @@ void AP_MotorsMatrix::set_frame_class_and_type(motor_frame_class frame_class, mo
 }
 
 float actuator_av= 0.0f;
-
-void RC_Channel::read_mode_switch()
+float perc_piezo=0.0f;
+float RC_Channel::output_piezo(aux_switch_pos_t) const
 {
     // calculate position of flight mode switch
-    const uint16_t pulsewidth = get_radio_in();
-    if (pulsewidth <= 900 || pulsewidth >= 2200) {
-        return;  // This is an error condition
+    const uint16_t inp = get_radio_in();
+    if (inp < AUX_PWM_TRIGGER_LOW) {
+        return 0.0f;  
+        perc_piezo=0.0f;
+    } else if (inp > AUX_PWM_TRIGGER_HIGH) {
+        return 1.0f;
+        perc_piezo=1.0f;
+    } else {
+        return 0.5f;
+        perc_piezo=0.5f;
     }
+    
+}
+
 /*int16_t RC_Channel::output_piezo(){
 int16_t piezo=RC_Channel::output_piezo(0);
 }
@@ -103,7 +113,6 @@ uint16_t AP_MotorsMatrix::get_motor_mask()
 }
 
 */
-float perc_piezo=0.0f;
 
 void AP_MotorsMatrix::output_to_motors()
 {
