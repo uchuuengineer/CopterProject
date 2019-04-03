@@ -219,7 +219,7 @@ float actuator_av= 0.0f;
             _actuator[i]=(1-perc_piezo)*(_actuator[i]) + perc_piezo*actuator_av;
                  // _actuator[i]=actuator_av;
            rc_write(i, output_to_pwm(_actuator[i]));  // EDIT HERE, FLIGHT CONTROL
-           rc_write(i+4, output_to_pwm((_actuator[i])*.3));
+           rc_write(i+4, output_to_pwm(1));
         }
     }
 }
