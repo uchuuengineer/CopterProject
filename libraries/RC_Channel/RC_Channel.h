@@ -245,7 +245,11 @@ public:
     //Documentation of Aux Switch Flags:
     // 0 is low or false, 1 is center or true, 2 is high
     // pairs of bits in old_switch_positions give the old switch position for an RC input.
-    float output_piezo(aux_switch_pos_t) const;   //////////////////////////////
+
+    float output_piezo(aux_switch_pos_t &perc_piezo) const;   
+    //int16_t    get_radio_in() const { return radio_in;}
+    float testfun(float chec) const;
+
     static uint32_t old_switch_positions;
 
     aux_switch_pos_t old_switch_position() const {

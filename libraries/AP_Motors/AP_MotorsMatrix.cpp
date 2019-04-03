@@ -21,10 +21,70 @@
 #include <AP_HAL/AP_HAL.h>
 #include "AP_MotorsMatrix.h"
 #include <RC_Channel/RC_Channel.h>
+#include <stdlib.h>
+#include <cmath>
+
+#include <AP_Math/AP_Math.h>
+#include <GCS_MAVLink/GCS.h>
+
+#include <AC_Avoidance/AC_Avoid.h>
+#include <AC_Sprayer/AC_Sprayer.h>
+#include <AP_Gripper/AP_Gripper.h>
+#include <AP_LandingGear/AP_LandingGear.h>
 
 extern const AP_HAL::HAL& hal;
 
+/*const AP_Param::GroupInfo AP_MotorsMatrix::var_info[] = {
+    // @Param: PERC_PIEZO
+    // @DisplayName: RC min PWM
+    // @Description: RC minimum PWM pulse width in microseconds. Typically 1000 is lower limit, 1500 is neutral and 2000 is upper limit.
+    // @Units: PWM
+    // @Range: 0 1
+    // @Increment: .1
+    // @User: Advanced
+    AP_GROUPINFO("PERC_PIEZO",  1, AP_MotorsMatrix, perc_piezo, 0),
+
+    // @Param: START_CHAN
+    // @DisplayName: Input channel for engine start
+    // @Description: This is an RC input channel for requesting engine start. Engine will try to start when channel is at or above 1700. Engine will stop when channel is at or below 1300. Between 1301 and 1699 the engine will not change state unless a MAVLink command or mission item commands a state change, or the vehicle is disamed.
+    // @User: Standard
+    // @Values: 0:None,1:Chan1,2:Chan2,3:Chan3,4:Chan4,5:Chan5,6:Chan6,7:Chan7,8:Chan8,9:Chan9,10:Chan10,11:Chan11,12:Chan12,13:Chan13,14:Chan14,15:Chan15,16:Chan16
+    AP_GROUPINFO("START_CHAN", 1, AP_ICEngine, start_chan, 0),
+
+        AP_GROUPEND
+};/*
+
 // init
+/*uint8_t RC_Channels::get_radio_in(uint16_t *chans, const uint8_t num_channels)
+{
+    memset(chans, 0, num_channels*sizeof(*chans));
+
+    const uint8_t read_channels = MIN(num_channels, NUM_RC_CHANNELS);
+    for (uint8_t i = 0; i < read_channels; i++) {
+        chans[i] = channel(i)->get_radio_in();
+    }
+
+    return read_channels;
+}
+/*
+void RC_Channel::read_mode_switch()
+{
+    // calculate position of flight mode switch
+    const uint16_t pulsewidth = get_radio_in();
+    if (pulsewidth <= 900 || pulsewidth >= 2200) {
+        return;  // This is an error condition
+    }
+
+    modeswitch_pos_t position;
+    if      (pulsewidth < 1231) position = 0;
+    else if (pulsewidth < 1361) position = 1;
+    else if (pulsewidth < 1491) position = 2;
+    else if (pulsewidth < 1621) position = 3;
+    else if (pulsewidth < 1750) position = 4;
+    else position = 5;
+}
+*/
+
 void AP_MotorsMatrix::init(motor_frame_class frame_class, motor_frame_type frame_type)
 {
     // record requested frame class and type
@@ -70,53 +130,50 @@ void AP_MotorsMatrix::set_frame_class_and_type(motor_frame_class frame_class, mo
     // enable fast channels or instant pwm
     set_update_rate(_speed_hz);
 }
-
-float actuator_av= 0.0f;
-float perc_piezo=0.0f;
-float RC_Channel::output_piezo(aux_switch_pos_t) const
+/*
+float RC_Channel::output_piezo(RC_Channel::aux_switch_pos_t &ret) const 
 {
     // calculate position of flight mode switch
     const uint16_t inp = get_radio_in();
-    if (inp < AUX_PWM_TRIGGER_LOW) {
-        return 0.0f;  
-        perc_piezo=0.0f;
-    } else if (inp > AUX_PWM_TRIGGER_HIGH) {
-        return 1.0f;
-        perc_piezo=1.0f;
+    if (inp > AUX_PWM_TRIGGER_LOW) { 
+        perc_piezo= 0.0f;
+        return 0.0f;                            //need a return statement for a non-void function
+    } else if (inp < AUX_PWM_TRIGGER_HIGH) {
+        perc_piezo= 1.0;
+        return 1.0;
     } else {
-        return 0.5f;
-        perc_piezo=0.5f;
+        perc_piezo= 0.5;
+        return 0.5;
     }
+}
+*/
     
-}
-
-/*int16_t RC_Channel::output_piezo(){
-int16_t piezo=RC_Channel::output_piezo(0);
-}
-*/
-//       uint16_t in = RC_Channel::get_radio_in();
-/*
-uint16_t AP_MotorsMatrix::get_motor_mask()
-{
-    uint16_t motor_mask = 0;
-    for (uint8_t i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {
-        if (motor_enabled[i]) {
-            motor_mask |= 1U << i;
-        }
-    }
-    uint16_t mask = rc_map_mask(motor_mask);
-
-    // add parent's mask
-    mask |= AP_MotorsMulticopter::get_motor_mask();
-
-    return mask;
-}
-
-*/
-
+float RC_Channel::testfun(float chec) const{
+    //perc_piezo=1.0f;
+    return chec;
+} 
+float perc_piezo=0.0f;
+int start_chan=6;
 void AP_MotorsMatrix::output_to_motors()
 {
     int8_t i;
+    //perc_piezo=testfun(1.0)
+    //perc_piezo=RC_Channel::testfun();
+    //perc_piezo=RC_Channel::output_piezo(); 
+    //perc_piezo=output_piezo(RC_Channel::aux_switch_pos_t);
+    uint16_t cvalue = 1500;
+    RC_Channel *c = rc().channel(start_chan-1);
+    if (c != nullptr) {
+        // get starter control channel
+        cvalue = c->get_radio_in();
+    }
+    if (cvalue < 1200) {
+        perc_piezo=0.0f;  
+    } else if (cvalue > 1800) {
+        perc_piezo=1.0f;
+    } else {
+        perc_piezo=0.5f;
+    }
 
     switch (_spool_mode) {
         case SHUT_DOWN: {
@@ -148,9 +205,7 @@ void AP_MotorsMatrix::output_to_motors()
             break;
     }
 
-
-
-
+float actuator_av= 0.0f;
 
     // convert output to PWM and send to each motor
     for (i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++) {

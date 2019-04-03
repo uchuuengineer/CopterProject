@@ -19,12 +19,13 @@ public:
         AP_MotorsMulticopter(loop_rate, speed_hz)
     {};
 
+//static const struct AP_Param::GroupInfo var_info[];
+
     // init
     void                init(motor_frame_class frame_class, motor_frame_type frame_type) override;
 
     // set frame class (i.e. quad, hexa, heli) and type (i.e. x, plus)
     void                set_frame_class_and_type(motor_frame_class frame_class, motor_frame_type frame_type) override;
-
     // set update rate to motors - a value in hertz
     // you must have setup_motors before calling this
     void                set_update_rate(uint16_t speed_hz) override;
@@ -54,7 +55,6 @@ public:
     // return the roll factor of any motor, this is used for tilt rotors and tail sitters
     // using copter motors for forward flight
     float               get_roll_factor(uint8_t i) override { return _roll_factor[i]; }
-
 protected:
     // output - sends commands to the motors
     void                output_armed_stabilizing() override;
@@ -70,7 +70,7 @@ protected:
 
     // add_motor using separate roll and pitch factors (for asymmetrical frames) and prop direction
     void                add_motor(int8_t motor_num, float roll_factor_in_degrees, float pitch_factor_in_degrees, float yaw_factor, uint8_t testing_order);
-
+   // float testfun();
     // remove_motor
     void                remove_motor(int8_t motor_num);
 
@@ -83,6 +83,8 @@ protected:
     // call vehicle supplied thrust compensation if set
     void                thrust_compensation(void) override;
 
+    //float               perc_piezo;
+    //int                 start_chan;
     float               _roll_factor[AP_MOTORS_MAX_NUM_MOTORS]; // each motors contribution to roll
     float               _pitch_factor[AP_MOTORS_MAX_NUM_MOTORS]; // each motors contribution to pitch
     float               _yaw_factor[AP_MOTORS_MAX_NUM_MOTORS];  // each motors contribution to yaw (normally 1 or -1)
